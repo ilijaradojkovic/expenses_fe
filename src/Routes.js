@@ -6,6 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 import RegisterScreen from "./screens/Register/RegisterScreen";
 import HomeScreen from "./screens/Home/HomeScreen";
 import LoginScreen from "./screens/Login/LoginScreen";
+import ResetPasswordScreen from "./screens/ResetPasswordScreen.js/resetPasswordScreen";
+import RequestResetPasswordScreen from "./screens/RequestResetPasswordScreen/RequestResetPassword";
+import VerifyOTPScreen from "./screens/ValidateOTPScreen/ValidateOTPScreen";
 
 
 
@@ -16,8 +19,12 @@ function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Login" component={LoginScreen} />
-      {/* Ako budeš imao RegisterScreen: */}
-      {/* <Stack.Screen name="Register" component={RegisterScreen} /> */}
+      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="RequestResetPassword" component={RequestResetPasswordScreen} />
+      <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+      <Stack.Screen name="Validate_OTP" component={VerifyOTPScreen} />
+
+
     </Stack.Navigator>
   );
 }

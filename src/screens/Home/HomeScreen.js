@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import dayjs from "dayjs";
 import { getMonthlyIncome } from "../../services/expenseService";
-import { getGreenColor, getPrimarycolor } from "../../constants/theme";
+import { getGreenColor, getPrimarycolor } from "../../theme/theme";
 import Header from "./components/Header";
 
 const HomeScreen = () => {
