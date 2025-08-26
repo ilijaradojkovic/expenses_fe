@@ -10,6 +10,11 @@ export const emailRule = Yup.string()
   .email("Email is not valid")
   .required("Email is required");
 
+  // Zajedničko pravilo za email
+export const usernameRule = Yup.string()
+  .required("Username is required");
+
+
 
 
 
@@ -21,12 +26,15 @@ export const loginSchema = Yup.object().shape({
 });
 
 
+
+
 export const registerSchema = Yup.object().shape({
   email: emailRule,
   password: passwordRule,
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords do not match")
     .required("Confirm password is required"),
+  username: usernameRule
 });
 
 export const resetPasswordSchema = Yup.object().shape({

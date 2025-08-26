@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Alert, Image, Pressable } from "react-native";
 import {
   TextInput,
@@ -9,7 +9,7 @@ import {
   HelperText,
 } from "react-native-paper";
 import { login, loginUser } from "../../services/authService";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import LoginImage from "assets/login.png";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -21,31 +21,52 @@ import { useNavigation } from "@react-navigation/native";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import { loginSchema } from "../../config/validationRules";
+import { resetErrorText } from "../../redux/userSlice";
 
 export default function LoginScreen({ onLogin }) {
+  const dispatch = useDispatch();
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
+  const navigation = useNavigation();
+  const { loading, error } = useSelector((state) => state.user);
+
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isValid },
   } = useForm({
     resolver: yupResolver(loginSchema),
     mode: "onChange", // validacija u realnom vremenu
   });
 
-  const dispatch = useDispatch();
-  const { colors } = useTheme();
-  const styles = makeStyles(colors);
-  const navigation = useNavigation();
-
   const onSubmit = (data) => {
     console.log("Podaci sa forme:", data);
+
     dispatch(loginUser(data));
+
+    reset({
+      email: "",
+      password: "",
+    });
   };
+
+  useEffect(() => {
+    dispatch(resetErrorText());
+  }, [dispatch]);
 
   return (
     <View style={styles.container}>
       <Image source={LoginImage} style={styles.image} resizeMode="contain" />
       <Text style={styles.title}>Login</Text>
+      {error && (
+        <HelperText
+          type="error"
+          style={[styles.helper, styles.errorScreenText]}
+        >
+          "Wrong email or password"
+        </HelperText>
+      )}
 
       {/* EMAIL */}
       <Controller
@@ -106,9 +127,11 @@ export default function LoginScreen({ onLogin }) {
       <Button
         mode="contained"
         onPress={handleSubmit(onSubmit)}
+        loading={loading} // <--- spinner dok je true
+        disabled={loading} // opcionalno, da dugme ne može da se pritisne dok se učitava
         style={styles.button}
       >
-        Login
+        {loading ? "" : "Login"}
       </Button>
 
       <Text style={styles.supportText1}>Or login with</Text>
@@ -145,6 +168,11 @@ export const makeStyles = (colors) => ({
     justifyContent: "center",
     paddingHorizontal: 20,
     backgroundColor: colors.background, // koristi boju iz teme
+  },
+  errorScreenText: {
+    textAlign: "center",
+    backgroundColor: colors.errorContainer,
+    color: colors.error,
   },
   title: {
     textAlign: "center",

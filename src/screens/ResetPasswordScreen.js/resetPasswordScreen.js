@@ -7,32 +7,33 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import ResetPasswordImage from "assets/forgot-password.png";
 import { Button } from "../../theme/customButton";
 import { BORDER_RADII, FONT_SIZES, MARGINS, PADDINGS } from "../../theme/theme";
-import { requestResetSchema } from "../../config/validationRules";
-
+import { resetPasswordSchema } from "../../config/validationRules";
 
 export default function ResetPasswordScreen() {
-      const { colors } = useTheme();
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
 
-        const styles = makeStyles(colors);
-      
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: yupResolver(requestResetSchema),
-     mode: "onChange"
+    resolver: yupResolver(resetPasswordSchema),
+    mode: "onChange",
   });
 
   const onSubmit = async (data) => {
     // Pozovi API ili parent handler
-  
   };
 
   return (
     <View style={styles.container}>
-       <Image source={ResetPasswordImage} style={styles.image} resizeMode="contain" />
-        
+      <Image
+        source={ResetPasswordImage}
+        style={styles.image}
+        resizeMode="contain"
+      />
+
       <Title style={styles.title}>Reset Password</Title>
 
       {/* Password */}
@@ -48,7 +49,11 @@ export default function ResetPasswordScreen() {
               secureTextEntry
               style={styles.input}
             />
-            <HelperText type="error" visible={!!errors.password} style={styles.helper}>
+            <HelperText
+              type="error"
+              visible={!!errors.password}
+              style={styles.helper}
+            >
               {errors.password?.message}
             </HelperText>
           </>
@@ -97,7 +102,6 @@ export const makeStyles = (colors) => ({
     padding: PADDINGS.large,
     justifyContent: "center",
     backgroundColor: colors.background, // koristi boju iz teme
-
   },
   title: {
     textAlign: "center",
@@ -106,12 +110,12 @@ export const makeStyles = (colors) => ({
     fontWeight: "bold",
     color: colors.onBackground,
   },
- 
+
   helper: {
     marginTop: -MARGINS.tiny,
     marginBottom: MARGINS.small,
   },
-   input: {
+  input: {
     marginBottom: MARGINS.regular,
     backgroundColor: colors.surface, // pozadina input polja
     color: colors.onSurface, // boja teksta
@@ -119,7 +123,7 @@ export const makeStyles = (colors) => ({
   button: {
     marginTop: MARGINS.medium,
   },
-    image: {
+  image: {
     width: "100%",
     height: "40%",
   },

@@ -22,7 +22,7 @@ function AuthStack() {
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="RequestResetPassword" component={RequestResetPasswordScreen} />
       <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-      <Stack.Screen name="Validate_OTP" component={VerifyOTPScreen} />
+      {/* <Stack.Screen name="Validate_OTP" component={VerifyOTPScreen} /> */}
 
 
     </Stack.Navigator>

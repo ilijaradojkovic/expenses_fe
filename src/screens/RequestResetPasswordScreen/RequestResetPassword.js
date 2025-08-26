@@ -1,21 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet, Image } from "react-native";
-import { TextInput, HelperText, Title, useTheme } from "react-native-paper";
+import { TextInput, HelperText, Title, useTheme, Text } from "react-native-paper";
 import { useForm, Controller } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import ResetPasswordImage from "assets/forgot-password.png";
 import { Button } from "../../theme/customButton";
 import { BORDER_RADII, FONT_SIZES, MARGINS, PADDINGS } from "../../theme/theme";
+import { requestResetSchema } from "../../config/validationRules";
+import { useDispatch, useSelector } from "react-redux";
+import { resetErrorText } from "../../redux/userSlice";
 
 
 export default function RequestResetPasswordScreen() {
   const { colors } = useTheme();
   const styles = makeStyles(colors);
+    const { loading,error } = useSelector((state) => state.user);
+    const dispatch=useDispatch()
+
 
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting, isValid },
   } = useForm({
     resolver: yupResolver(requestResetSchema),
@@ -27,13 +34,30 @@ export default function RequestResetPasswordScreen() {
     // Ovde pozovi API koji šalje email za reset lozinke
     console.log("Reset request for email:", data.email);
     alert(`Reset link sent to ${data.email}`);
+    reset({
+      email:""
+    });
   };
+
+  
+   useEffect(()=>{
+    dispatch(resetErrorText());
+   },[dispatch])
 
   return (
     <View style={styles.container}>
       <Image source={ResetPasswordImage} style={styles.image} resizeMode="contain" />
 
-      <Title style={styles.title}>Reset Password</Title>
+      <Text style={styles.title}>Reset Password</Text>
+      {
+        error && (
+          
+          <HelperText type="error" style={[styles.helper,styles.errorScreenText]}>
+            "Wrong email or password"
+          </HelperText>
+        )
+            
+      }
 
       {/* EMAIL */}
       <Controller
@@ -60,11 +84,12 @@ export default function RequestResetPasswordScreen() {
       <Button
         mode="contained"
         onPress={handleSubmit(onSubmit)}
-        loading={isSubmitting}
-        disabled={!isValid}
+          loading={loading} // <--- spinner dok je true
+        disabled={loading}
         style={styles.button}
       >
-        Send Reset Link
+               {loading ? "" : "Send Reset Link"}
+
       </Button>
     </View>
   );
@@ -76,6 +101,11 @@ export const makeStyles = (colors) => ({
     padding: PADDINGS.large,
     justifyContent: "center",
     backgroundColor: colors.background,
+  },
+    errorScreenText:{
+   textAlign:'center',
+   backgroundColor:colors.errorContainer,
+   color:colors.error
   },
   title: {
     textAlign: "center",

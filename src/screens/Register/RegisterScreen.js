@@ -1,12 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Image, Alert } from "react-native";
-import {
-  TextInput,
-  Text,
-  useTheme,
-  HelperText,
-} from "react-native-paper";
-import { useDispatch } from "react-redux";
+import { TextInput, Text, useTheme, HelperText } from "react-native-paper";
+import { useDispatch, useSelector } from "react-redux";
 import RegisterImage from "assets/register.png";
 import { Button } from "../../theme/customButton";
 import { BORDER_RADII, FONT_SIZES, MARGINS, PADDINGS } from "../../theme/theme";
@@ -15,28 +10,43 @@ import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import { registerSchema } from "../../config/validationRules";
-
-
+import { resetErrorText } from "../../redux/userSlice";
+import { registerUser } from "../../services/authService";
 
 export default function RegisterScreen() {
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isValid },
   } = useForm({
     resolver: yupResolver(registerSchema),
     mode: "onChange",
   });
-
+  const { loading, error } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const { colors } = useTheme();
   const styles = makeStyles(colors);
   const navigation = useNavigation();
 
+  useEffect(() => {
+    dispatch(resetErrorText());
+  }, [dispatch]);
+
   const onSubmit = (data) => {
     console.log("Register podaci:", data);
-    // dispatch(registerUser(data));
+    dispatch(registerUser({
+      email:data.email,
+      password:data.password,
+      username:data.username
+    }));
     Alert.alert("Success", "Confirm your email and login");
+    reset({
+      email: "",
+      password: "",
+      confirmPassword: "",
+      username:""
+    });
     navigation.navigate("Login");
   };
 
@@ -44,7 +54,38 @@ export default function RegisterScreen() {
     <View style={styles.container}>
       <Image source={RegisterImage} style={styles.image} resizeMode="contain" />
       <Text style={styles.title}>Register</Text>
+      {error && (
+        <HelperText
+          type="error"
+          style={[styles.helper, styles.errorScreenText]}
+        >
+         {error.message}
+        </HelperText>
+      )}
 
+       {/* USERNAME */}
+      <Controller
+        control={control}
+        name="username"
+        defaultValue=""
+        render={({ field: { onChange, onBlur, value } }) => (
+          <>
+            <TextInput
+              label="Username"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              autoCapitalize="none"
+              style={styles.input}
+            />
+            {errors.username && (
+              <HelperText type="error" style={styles.helper}>
+                {errors.username.message}
+              </HelperText>
+            )}
+          </>
+        )}
+      />
       {/* EMAIL */}
       <Controller
         control={control}
@@ -122,8 +163,11 @@ export default function RegisterScreen() {
         mode="contained"
         onPress={handleSubmit(onSubmit)}
         style={styles.button}
+        loading={loading}
+        disabled={loading}
       >
-        Register
+                {loading ? "" : "Register"}
+
       </Button>
 
       <Text style={styles.supportText1}>
@@ -153,6 +197,11 @@ export const makeStyles = (colors) => ({
     paddingBottom: PADDINGS.large,
     fontWeight: "bold",
     color: colors.onBackground,
+  },
+  errorScreenText: {
+    textAlign: "center",
+    backgroundColor: colors.errorContainer,
+    color: colors.error,
   },
   input: {
     marginBottom: 15,
